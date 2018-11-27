@@ -1,0 +1,46 @@
+library(latticeExtra)
+#This is how you create the 50-50 graphs for each side, just changing the data set on each side
+dataLR$plate_x <- (-1 * dataLR$plate_x)
+dataLR.loess <- loess(Strike~plate_x + plate_z, data = dataLR,
+                      control = loess.control(surface="direct"))
+pred.area <- expand.grid(plate_x = seq(-3,3,0.1), plate_z =seq(0,6,0.1))
+pred.area$fit <- c(predict(dataLR.loess, pred.area))
+LR <- contourplot(fit~plate_x + plate_z, data = pred.area,
+            at=c(.5,.75),
+            aspect="iso",
+            xlim=c(-3,3),
+            ylim=c(0,5.5),
+            xlab="Catcher's View\n(ft. from middle of plate)",
+            ylab="Pitch Height (ft.)",
+            main = "Left-Handed Hitter vs Right-Handed Pitcher",
+            panel=function(...){
+              panel.contourplot(...)
+              panel.rect(-0.75,1.6,0.75,3.6, lty = 3)
+            }
+)
+
+#Sorting the catcher's data so it is useable, and you can see strike called probabilities and graph pitch locations.
+PerezLL <- subset(PerezLL, plate_x != "null" | plate_z != "null")
+PerezLR <- subset(PerezLR, plate_x != "null" | plate_z != "null")
+PerezRL <- subset(PerezRL, plate_x != "null" | plate_z != "null")
+PerezRR <- subset(PerezRR, plate_x != "null" | plate_z != "null")
+
+PerezLL$plate_x <- as.numeric(as.character(PerezLL$plate_x))
+PerezLR$plate_x <- as.numeric(as.character(PerezLR$plate_x))
+PerezRL$plate_x <- as.numeric(as.character(PerezRL$plate_x))
+PerezRR$plate_x <- as.numeric(as.character(PerezRR$plate_x))
+
+PerezLL$plate_z <- as.numeric(as.character(PerezLL$plate_z))
+PerezLR$plate_z <- as.numeric(as.character(PerezLR$plate_z))
+PerezRL$plate_z <- as.numeric(as.character(PerezRL$plate_z))
+PerezRR$plate_z <- as.numeric(as.character(PerezRR$plate_z))
+
+PerezLL$fit <- c(predict(dataLL.loess, PerezLL))
+PerezLR$fit <- c(predict(dataLR.loess, PerezLR))
+PerezRL$fit <- c(predict(dataRL.loess, PerezRL))
+PerezRR$fit <- c(predict(dataRR.loess, PerezRR))
+
+PerezLL.graph <- xyplot(plate_z~(-plate_x), data = PerezLL)
+PerezLR.graph <- xyplot(plate_z~(-plate_x), data = PerezLR)
+PerezRL.graph <- xyplot(plate_z~(-plate_x), data = PerezRL)
+PerezRR.graph <- xyplot(plate_z~(-plate_x), data = PerezRR)
