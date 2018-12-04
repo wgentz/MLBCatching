@@ -1,6 +1,6 @@
 library(latticeExtra)
 #This is how you create the 50-50 graphs for each side, just changing the data set on each side
-dataLR$plate_x <- (-1 * dataLR$plate_x)
+dataLR$plate_x <- (-1 * dataLR$plate_x) #This is to flip the view, so it's catcher's view instead of pitcher's
 dataLR.loess <- loess(Strike~plate_x + plate_z, data = dataLR,
                       control = loess.control(surface="direct"))
 pred.area <- expand.grid(plate_x = seq(-3,3,0.1), plate_z =seq(0,6,0.1))
